@@ -20,7 +20,7 @@ def buscar_descricao_firebird(ID_ESTOQUE):
             FROM TB_EST_PRODUTO p
             JOIN TB_EST_IDENTIFICADOR i ON p.ID_IDENTIFICADOR = i.ID_IDENTIFICADOR
             JOIN TB_ESTOQUE e ON i.ID_ESTOQUE = e.ID_ESTOQUE
-            WHERE p.ID_ESTOQUE = ?
+            WHERE e.ID_ESTOQUE = ?
         """
         cur.execute(query, (ID_ESTOQUE,))
         produto = cur.fetchone()

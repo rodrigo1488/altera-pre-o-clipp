@@ -48,7 +48,7 @@ def buscar_estoque(descricao):
         cursor = conn.cursor()
         
         query = """
-            SELECT e.DESCRICAO , e.PRC_VENDA , p.QTD_ATUAL, e.ID_ESTOQUE
+            SELECT e.DESCRICAO , e.PRC_VENDA , p.QTD_ATUAL, e.ID_ESTOQUE, p.COD_BARRA
             FROM TB_EST_PRODUTO p
             JOIN TB_EST_IDENTIFICADOR i ON p.ID_IDENTIFICADOR = i.ID_IDENTIFICADOR
             JOIN TB_ESTOQUE e ON i.ID_ESTOQUE = e.ID_ESTOQUE
@@ -67,7 +67,8 @@ def buscar_estoque(descricao):
                 "Descricao": item[0],
                  "Preco": item[1],
                 "Quantidade": item[2],
-                "ID_ESTOQUE": item[3]
+                "id_produto": item[3],
+                "codigo_barras": item[4]
                 })
             return jsonify(resultado)
         else:

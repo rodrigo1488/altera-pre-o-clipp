@@ -9,8 +9,7 @@ from waitress import serve
 
 from Routes.route_buscar_produto import Route_buscar_produto_bp
 from Routes.route_salvar import Route_salvar_bp
-from Routes.route_excluir import Route_excluir_bp
-from Routes.route_editar import Route_editar_bp
+
 from Routes.route_listar_contagem import Route_listar_contagem_bp
 from Routes.buscar_descricao import Buscar_descricao_bp
 from Routes.check_healt import CheckHealth_bp
@@ -62,10 +61,8 @@ def index():
     return render_template("index.html")
 app.register_blueprint(CheckHealth_bp)
 app.register_blueprint(Route_buscar_produto_bp)
-app.register_blueprint(Route_excluir_bp)
 app.register_blueprint(Route_listar_contagem_bp)
 app.register_blueprint(Buscar_descricao_bp)
-app.register_blueprint(Route_editar_bp)
 app.register_blueprint(Route_salvar_bp)
 app.register_blueprint(Database_bp)
 

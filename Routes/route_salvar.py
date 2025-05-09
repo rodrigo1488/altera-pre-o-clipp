@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import sqlite3
 import datetime
-import fdb
+
 from Routes.buscar_descricao import buscar_descricao_firebird
 from Routes.route_buscar_produto import buscar_produto
 from databases import CAMINHO_DB_LOCAL
@@ -21,7 +21,7 @@ def salvar_estoque(nome_usuario=None):
         quantidade = float(data["quantidade"])
         nome_usuario = nome_usuario.strip() if nome_usuario else "Desconhecido"
         preco = data.get("preco", 0.0)
-        ID_ESTOQUE = data.get("ID_ESTOQUE", None)
+        ID_ESTOQUE = data.get("id")
         print(ID_ESTOQUE)
 
 
@@ -47,20 +47,37 @@ def salvar_estoque(nome_usuario=None):
                     data_hora = excluded.data_hora
             """, (descricao, codigo_barras, quantidade, quantidade_sist, nome_usuario,preco, datetime.datetime.now().strftime("%d-%m-%Y %H:%M")))
             conn.commit()
+
+        
             
             return jsonify({"message": "Salvo com sucesso"}), 200
 
         except sqlite3.Error as e:
             return jsonify({"message": "Erro ao salvar no banco", "error": str(e)}), 500
         finally:
+            update_firebird(ID_ESTOQUE,preco,quantidade)
             conn.close()
-
-        conn = conectar_firebird()
-        cur = conn.cursor()
-        query = "UPDATE TB_EST_PRODUTO SET QTD_ATUAL = ? WHERE COD_BARRA = ?"
-
-
-
     except Exception as e:
         print(f"Erro no servidor: {e}")
         return jsonify({"message": "Erro no servidor", "error": str(e)}), 500
+    
+
+def update_firebird(ID_ESTOQUE, preco, quantidade):
+    try:
+        conn = conectar_firebird()
+        cur = conn.cursor()
+
+        # Atualiza o preço na tabela TB_ESTOQUE
+        query_preco = "UPDATE TB_ESTOQUE SET PRC_VENDA = ? WHERE ID_ESTOQUE = ?"
+        cur.execute(query_preco, (preco, ID_ESTOQUE))
+
+        # Atualiza a quantidade na tabela TB_EST_PRODUTO
+        query_quantidade = "UPDATE TB_EST_PRODUTO SET QTD_ATUAL = ? WHERE ID_IDENTIFICADOR = ?"
+        cur.execute(query_quantidade, (quantidade, ID_ESTOQUE))
+
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Erro ao atualizar no Firebird: {e}")
+        return False
